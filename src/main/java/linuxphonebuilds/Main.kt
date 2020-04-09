@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
+
 val multipleWhitespaceRegex by lazy { "\\s\\s+".toRegex() }
 
 enum class OS {
@@ -63,13 +64,18 @@ fun main(args: Array<String>) {
         }
     }
 
-    // createRSSFile("All", feeds.flatMap { it.value }.toMutableList())
+    // rssFileTool.createFile("All", feeds.flatMap { it.value }.toMutableList())
 
     if (host != null && username != null && password != null) {
         println("Start uploading files")
         val sftpTool = SftpTool()
         sftpTool.uploadToSFTP(host, username, password)
     }
+
+    val logTool = LogTool()
+    logTool.log("Summary: " + feeds.toList().joinToString {
+        "${it.first.getName()} ${it.second.count()}"
+    })
 
     println("Job done")
 }
