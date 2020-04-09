@@ -12,11 +12,12 @@ Because it's more convenient to get a notification from your RSS reader app inst
 - [Ubuntu Touch by UBPorts](http://linuxcommandlibrary.com/linuxphone/ubuntu_touch/rss.xml)
 - [Debian + Phosh](http://linuxcommandlibrary.com/linuxphone/debian/rss.xml)
 - [Fedora](http://linuxcommandlibrary.com/linuxphone/fedora/rss.xml)
+- [Arch Linux ARM](http://linuxcommandlibrary.com/linuxphone/arch/rss.xml)
+- [KDE Neon](http://linuxcommandlibrary.com/linuxphone/kde_neon/rss.xml)
 
 Current RSS feeds get updated every hour and are hosted on my http://linuxcommandlibrary.com website.
 
 ## TODO:
-- Add logging
 - Add tests
 - Make it more robust and catch exceptions
 - Fix artifact build(somehow the manifest inside the jar is not the one I defined)
@@ -24,10 +25,8 @@ Current RSS feeds get updated every hour and are hosted on my http://linuxcomman
 #### Missing distros:
 - Manjaro ARM
 - SailfishOS
-- Arch Linux ARM
 - Maemo Leste
 - Nemo Mobile
-- KDE Neon
 - NixOS
 - LuneOS
 
