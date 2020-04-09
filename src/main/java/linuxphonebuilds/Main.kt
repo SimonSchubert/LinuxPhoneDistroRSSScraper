@@ -202,32 +202,42 @@ fun getUbuntuTouchItems(): MutableList<Pair<String, Long>> {
     }.toMutableList()
 }
 
-@Throws(Exception::class)
 fun getPureOsItems(): MutableList<Pair<String, Long>> {
-    val url = "https://droppy.ironrobin.net/#/Images/PureOS"
-
+    val url = "http://pureos.ironrobin.net/droppy/#/Images"
     System.setProperty("webdriver.gecko.driver", "geckodriver")
-    val driver = FirefoxDriver()
-    driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-    driver.get(url)
 
-    // WebDriverWait didn't work. Workaround:
-    Thread.sleep(30_000)
+    val driver = try {
+        FirefoxDriver()
+    } catch (exception: Exception) {
+        println("FirefoxDriver: " + exception.message)
+        return mutableListOf()
+    }
 
-    val doc = Jsoup.parse(driver.pageSource)
-    driver.close()
+    val doc = try {
+        driver.manage()?.timeouts()?.implicitlyWait(30, TimeUnit.SECONDS);
+        driver.get(url)
+
+        // WebDriverWait didn't work. Workaround:
+        Thread.sleep(30_000)
+
+        Jsoup.parse(driver.pageSource)
+    } catch (exception: Exception) {
+        driver.close()
+        println("Error fetching pureos: " + exception.message)
+        return mutableListOf()
+    }
 
     val rows = doc.select(".data-row")
     return rows.mapNotNull {
         val timestamp = it.select(".mtime").attr("data-timestamp").toLongOrNull()
         // abs:href didn't work. Workaround:
-        val itemUrl = "https://droppy.ironrobin.net/" + it.select("a").attr("href")
+        val itemUrl = "http://pureos.ironrobin.net" + it.select("a").attr("href")
         if (timestamp != null) {
             (itemUrl to timestamp)
         } else {
             null
         }
-    }.toMutableList()
+    }.toMutableList() ?: mutableListOf()
 }
 
 fun OS.getName(): String {
