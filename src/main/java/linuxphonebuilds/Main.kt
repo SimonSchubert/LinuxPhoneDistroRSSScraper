@@ -15,10 +15,8 @@
  */
 package linuxphonebuilds
 
-import com.jcraft.jsch.*
 import org.jsoup.Jsoup
 import org.openqa.selenium.firefox.FirefoxDriver
-import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -57,10 +55,11 @@ fun main(args: Array<String>) {
     feeds[OS.KDE_NEON] = getKdeNeonItems()
     feeds[OS.ARCH] = getArchItems()
 
+    val rssFileTool = RSSFileTool()
     feeds.forEach { (t, u) ->
         println("Fetched ${u.count()} ${t.getName()} items")
         if (u.isNotEmpty()) {
-            createRSSFile(t.getName(), u)
+            rssFileTool.createFile(t.getName(), u)
         }
     }
 
@@ -68,78 +67,11 @@ fun main(args: Array<String>) {
 
     if (host != null && username != null && password != null) {
         println("Start uploading files")
-        uploadToSFTP(host, username, password)
+        val sftpTool = SftpTool()
+        sftpTool.uploadToSFTP(host, username, password)
     }
 
     println("Job done")
-}
-
-fun uploadToSFTP(host: String, username: String, password: String) {
-    val jsch = JSch()
-    val session: Session?
-    try {
-        session = jsch.getSession(username, host, 22)
-        session.setConfig("StrictHostKeyChecking", "no")
-        session.setPassword(password)
-        session.connect()
-        val channel: Channel = session.openChannel("sftp")
-        channel.connect()
-        val sftpChannel = channel as ChannelSftp
-        sftpChannel.cdOrMkdir("linuxcommandlibrary")
-        sftpChannel.cdOrMkdir("linuxphone")
-        File("feeds").listFiles()?.forEach { directory ->
-            sftpChannel.cdOrMkdir(directory.name)
-            directory.canonicalFile.listFiles()?.forEach {
-                sftpChannel.put(it.absolutePath, it.name)
-            }
-            sftpChannel.cd("..")
-        }
-        sftpChannel.exit()
-        session.disconnect()
-    } catch (e: JSchException) {
-        e.printStackTrace()
-    } catch (e: SftpException) {
-        e.printStackTrace()
-    }
-}
-
-fun ChannelSftp.cdOrMkdir(folder: String) {
-    try {
-        this.cd(folder)
-    } catch (e: SftpException) {
-        this.mkdir(folder)
-        this.cd(folder)
-    }
-}
-
-fun createRSSFile(id: String, feeds: MutableList<Pair<String, Long>>) {
-    val folder = id.replace(" ", "_").toLowerCase()
-    File("feeds/$folder").mkdirs()
-    val fileName = "feeds/$folder/rss.xml"
-    val file = File(fileName)
-    file.createNewFile()
-
-    val feedItems = feeds.sortedByDescending { it.second }.joinToString("") {
-        val publishDate = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(it.second)
-        val titleDate = SimpleDateFormat("dd.MMM.yyyy HH:mm").format(it.second)
-        val url = it.first
-        "<item>" +
-                "<title>Pinephone - $id - $titleDate</title>" +
-                "<link>$url</link>" +
-                "<pubDate>$publishDate</pubDate>" +
-                "</item>"
-    }
-
-    val content = "<rss version=\"2.0\">" +
-            "<channel>" +
-            "<title>$id Pinephone builds</title>" +
-            "<link>https://linuxcommandlibrary.com/</link>" +
-            "<description>Latest builds.</description>" +
-            feedItems +
-            "</channel>" +
-            "</rss>"
-
-    file.writeText(content)
 }
 
 fun getKdeNeonItems(): MutableList<Pair<String, Long>> {
