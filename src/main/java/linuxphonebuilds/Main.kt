@@ -31,7 +31,8 @@ enum class OS {
     PUREOS,
     DEBIAN,
     POSTMARKET_OS,
-    FEDORA
+    FEDORA,
+    KDE_NEON
 }
 
 val feeds: MutableMap<OS, MutableList<Pair<String, Long>>> = mutableMapOf()
@@ -52,6 +53,7 @@ fun main(args: Array<String>) {
     feeds[OS.POSTMARKET_OS] = getPostmarketOSItems()
     feeds[OS.FEDORA] = getFedoraItems()
     feeds[OS.PUREOS] = getPureOsItems()
+    feeds[OS.KDE_NEON] = getKdeNeonItems()
 
     feeds.forEach { (t, u) ->
         println("Fetched ${u.count()} ${t.getName()} items")
@@ -154,6 +156,27 @@ fun getFedoraItems(): MutableList<Pair<String, Long>> {
     }.toMutableList()
 }
 
+fun getKdeNeonItems(): MutableList<Pair<String, Long>> {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
+    val url = "https://images.plasma-mobile.org/pinephone/"
+    val doc = Jsoup.connect(url).get()
+    val rows = doc.select("tr")
+    return rows.mapNotNull { entry ->
+        val itemUrl = entry.select("a").map { it.attr("abs:href") }.filter { it.contains(".img") }.firstOrNull()
+        if (itemUrl != null) {
+            val date = entry.select("td").getOrNull(2)?.text()
+            val timestamp = try {
+                dateFormat.parse("$date")?.time ?: 0L
+            } catch (e: ParseException) {
+                0L
+            }
+            (itemUrl to timestamp)
+        } else {
+            null
+        }
+    }.toMutableList()
+}
+
 fun getPostmarketOSItems(): MutableList<Pair<String, Long>> {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
     val url = "http://images.postmarketos.org/pinephone/"
@@ -176,7 +199,7 @@ fun getSimpleFileTreeTableItems(url: String, dateFormat: SimpleDateFormat, fileE
         val time = parts.getOrNull(2)
         if (fileName != null && date != null && time != null) {
             val timestamp = try {
-                dateFormat.parse("$date $time").time
+                dateFormat.parse("$date $time")?.time ?: 0L
             } catch (e: ParseException) {
                 0L
             }
@@ -247,5 +270,6 @@ fun OS.getName(): String {
         OS.DEBIAN -> "Debian"
         OS.POSTMARKET_OS -> "postmarketOS"
         OS.FEDORA -> "Fedora"
+        OS.KDE_NEON -> "KDE Neon"
     }
 }
