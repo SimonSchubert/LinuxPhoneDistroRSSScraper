@@ -32,7 +32,8 @@ enum class OS {
     DEBIAN,
     POSTMARKET_OS,
     FEDORA,
-    KDE_NEON
+    KDE_NEON,
+    ARCH
 }
 
 val feeds: MutableMap<OS, MutableList<Pair<String, Long>>> = mutableMapOf()
@@ -54,6 +55,7 @@ fun main(args: Array<String>) {
     feeds[OS.FEDORA] = getFedoraItems()
     feeds[OS.PUREOS] = getPureOsItems()
     feeds[OS.KDE_NEON] = getKdeNeonItems()
+    feeds[OS.ARCH] = getArchItems()
 
     feeds.forEach { (t, u) ->
         println("Fetched ${u.count()} ${t.getName()} items")
@@ -140,22 +142,6 @@ fun createRSSFile(id: String, feeds: MutableList<Pair<String, Long>>) {
     file.writeText(content)
 }
 
-fun getFedoraItems(): MutableList<Pair<String, Long>> {
-    val url = "https://github.com/nikhiljha/pp-fedora-sdsetup/releases/"
-    val doc = Jsoup.connect(url).get()
-    val rows = doc.select(".release-entry")
-    return rows.mapNotNull { entry ->
-        val itemUrl = entry.select(".Details-element").select("a").map { it.attr("abs:href") }.filter { it.contains(".img") }.firstOrNull()
-        val dateTime = entry.select("relative-time").attr("datetime")
-        val instant = Instant.parse(dateTime)
-        if (itemUrl != null) {
-            (itemUrl to instant.toEpochMilli())
-        } else {
-            null
-        }
-    }.toMutableList()
-}
-
 fun getKdeNeonItems(): MutableList<Pair<String, Long>> {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
     val url = "https://images.plasma-mobile.org/pinephone/"
@@ -171,6 +157,31 @@ fun getKdeNeonItems(): MutableList<Pair<String, Long>> {
                 0L
             }
             (itemUrl to timestamp)
+        } else {
+            null
+        }
+    }.toMutableList()
+}
+
+fun getFedoraItems(): MutableList<Pair<String, Long>> {
+    val url = "https://github.com/nikhiljha/pp-fedora-sdsetup/releases/"
+    return getGithubReleaseItems(url)
+}
+
+fun getArchItems(): MutableList<Pair<String, Long>> {
+    val url = "https://github.com/dreemurrs-embedded/Pine64-Arch/releases"
+    return getGithubReleaseItems(url)
+}
+
+fun getGithubReleaseItems(url: String): MutableList<Pair<String, Long>> {
+    val doc = Jsoup.connect(url).get()
+    val rows = doc.select(".release-entry")
+    return rows.mapNotNull { entry ->
+        val itemUrl = entry.select(".Details-element").select("a").map { it.attr("abs:href") }.firstOrNull { it.contains(".img") }
+        val dateTime = entry.select("relative-time").attr("datetime")
+        val instant = Instant.parse(dateTime)
+        if (itemUrl != null) {
+            (itemUrl to instant.toEpochMilli())
         } else {
             null
         }
@@ -271,5 +282,6 @@ fun OS.getName(): String {
         OS.POSTMARKET_OS -> "postmarketOS"
         OS.FEDORA -> "Fedora"
         OS.KDE_NEON -> "KDE Neon"
+        OS.ARCH -> "Arch"
     }
 }
