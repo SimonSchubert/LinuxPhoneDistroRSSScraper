@@ -194,9 +194,10 @@ fun getPureOsItems(): MutableList<Pair<String, Long>> {
 
         Jsoup.parse(driver.pageSource)
     } catch (exception: Exception) {
-        driver.close()
         println("Error fetching pureos: " + exception.message)
         return mutableListOf()
+    } finally {
+        driver.close()
     }
 
     val rows = doc.select(".data-row")
@@ -209,7 +210,7 @@ fun getPureOsItems(): MutableList<Pair<String, Long>> {
         } else {
             null
         }
-    }.toMutableList() ?: mutableListOf()
+    }.toMutableList()
 }
 
 fun OS.getName(): String {

@@ -22,11 +22,20 @@ class RSSFileTool {
                     "</item>"
         }
 
+        val faviconUrl = "http://linuxcommandlibrary.com/linuxphone/$folder/favicon.png"
+
         val content = "<rss version=\"2.0\">" +
                 "<channel>" +
-                "<title>$id Pinephone builds</title>" +
-                "<link>https://linuxcommandlibrary.com/</link>" +
+                "<title>Pinephone $id builds</title>" +
+                "<link>http://linuxcommandlibrary.com/</link>" +
                 "<description>Latest builds.</description>" +
+                "<image>" +
+                "<title>Pinephone $id</title>" +
+                "<url>$faviconUrl</url>" +
+                "<link>http://linuxcommandlibrary.com/</link>" +
+                "<width>32</width>" +
+                "<height>32</height>" +
+                "</image>" +
                 feedItems +
                 "</channel>" +
                 "</rss>"
