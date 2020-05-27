@@ -203,9 +203,10 @@ fun getPureOsItems(): MutableList<Pair<String, Long>> {
     val rows = doc.select(".data-row")
     return rows.mapNotNull {
         val timestamp = it.select(".mtime").attr("data-timestamp").toLongOrNull()
-        // abs:href didn't work. Workaround:
-        val itemUrl = "http://pureos.ironrobin.net" + it.select("a").attr("href")
-        if (timestamp != null) {
+        val name = it.attr("data-name")
+        if (name != "testing" && timestamp != null) {
+            // abs:href didn't work. Workaround:
+            val itemUrl = "http://pureos.ironrobin.net" + it.select("a").attr("href")
             (itemUrl to timestamp)
         } else {
             null
