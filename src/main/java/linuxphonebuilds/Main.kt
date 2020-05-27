@@ -127,9 +127,24 @@ fun getGithubReleaseItems(url: String): MutableList<Pair<String, Long>> {
 }
 
 fun getPostmarketOSItems(): MutableList<Pair<String, Long>> {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
+    val dateFormat = SimpleDateFormat("yyyy-MMM-dd HH:mm")
     val url = "http://images.postmarketos.org/pinephone/"
-    return getSimpleFileTreeTableItems(url, dateFormat, ".img")
+    val doc = Jsoup.connect(url).get()
+    val rows = doc.select("table#list").select("tr")
+    return rows.mapNotNull {
+        val timestamp = try {
+            dateFormat.parse(it.child(2).text())?.time ?: 0L
+        } catch (e: ParseException) {
+            0L
+        }
+        if (timestamp != 0L) {
+            val imageUrl = it.child(0).select("a").attr("abs:href")
+            if (imageUrl.endsWith("plasma.img.xz")) {
+                return@mapNotNull (imageUrl to timestamp)
+            }
+        }
+        null
+    }.toMutableList()
 }
 
 fun getMobianItems(): MutableList<Pair<String, Long>> {
