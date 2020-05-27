@@ -10,7 +10,7 @@ Because it's more convenient to get a notification from your RSS reader app inst
 - [PureOS](http://linuxcommandlibrary.com/linuxphone/pureos/rss.xml)
 - [postmarketOS](http://linuxcommandlibrary.com/linuxphone/postmarketos/rss.xml)
 - [Ubuntu Touch by UBPorts](http://linuxcommandlibrary.com/linuxphone/ubuntu_touch/rss.xml)
-- [Debian + Phosh](http://linuxcommandlibrary.com/linuxphone/debian/rss.xml)
+- [Mobian](http://linuxcommandlibrary.com/linuxphone/mobian/rss.xml)
 - [Fedora](http://linuxcommandlibrary.com/linuxphone/fedora/rss.xml)
 - [Arch Linux ARM](http://linuxcommandlibrary.com/linuxphone/arch/rss.xml)
 - [KDE Neon](http://linuxcommandlibrary.com/linuxphone/kde_neon/rss.xml)

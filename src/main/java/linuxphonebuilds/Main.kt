@@ -28,7 +28,7 @@ val multipleWhitespaceRegex by lazy { "\\s\\s+".toRegex() }
 enum class OS {
     UBPORTS,
     PUREOS,
-    DEBIAN,
+    MOBIAN,
     POSTMARKET_OS,
     FEDORA,
     KDE_NEON,
@@ -49,7 +49,7 @@ fun main(args: Array<String>) {
     val password = args.getOrNull(2)
 
     feeds[OS.UBPORTS] = getUbuntuTouchItems()
-    feeds[OS.DEBIAN] = getDebianItems()
+    feeds[OS.MOBIAN] = getMobianItems()
     feeds[OS.POSTMARKET_OS] = getPostmarketOSItems()
     feeds[OS.FEDORA] = getFedoraItems()
     feeds[OS.PUREOS] = getPureOsItems()
@@ -132,10 +132,10 @@ fun getPostmarketOSItems(): MutableList<Pair<String, Long>> {
     return getSimpleFileTreeTableItems(url, dateFormat, ".img")
 }
 
-fun getDebianItems(): MutableList<Pair<String, Long>> {
+fun getMobianItems(): MutableList<Pair<String, Long>> {
     val dateFormat = SimpleDateFormat("dd-MMM-yyyy HH:mm")
-    val url = "http://pinephone.a-wai.com/images/"
-    return getSimpleFileTreeTableItems(url, dateFormat, ".img")
+    val url = "https://images.mobian-project.org/pinephone/"
+    return getSimpleFileTreeTableItems(url, dateFormat, ".img.gz")
 }
 
 fun getSimpleFileTreeTableItems(url: String, dateFormat: SimpleDateFormat, fileExtension: String): MutableList<Pair<String, Long>> {
@@ -217,7 +217,7 @@ fun OS.getName(): String {
     return when (this) {
         OS.UBPORTS -> "Ubuntu Touch"
         OS.PUREOS -> "PureOS"
-        OS.DEBIAN -> "Debian"
+        OS.MOBIAN -> "Mobian"
         OS.POSTMARKET_OS -> "postmarketOS"
         OS.FEDORA -> "Fedora"
         OS.KDE_NEON -> "KDE Neon"
