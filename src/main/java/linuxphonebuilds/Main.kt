@@ -190,7 +190,7 @@ fun getUbuntuTouchItems(): MutableList<Pair<String, Long>> {
 }
 
 fun getPureOsItems(): MutableList<Pair<String, Long>> {
-    val url = "http://pureos.ironrobin.net/droppy/#/Images"
+    val url = "https://www.ironrobin.net/pureos/droppy/#/Images"
     System.setProperty("webdriver.gecko.driver", "geckodriver")
 
     val driver = try {
